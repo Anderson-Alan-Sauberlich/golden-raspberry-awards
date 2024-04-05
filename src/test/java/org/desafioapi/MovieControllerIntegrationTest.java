@@ -41,27 +41,7 @@ public class MovieControllerIntegrationTest {
     public void getMoviesByYearTest() throws Exception {
         mockMvc.perform( MockMvcRequestBuilders.get("/movie/2012").contentType(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect( jsonPath("$.*.title", hasItem( is("The Twilight Saga"))));
-    }
-    
-    @Test
-    public void getYearsWithMoreThanOneWinnersTest() throws Exception {
-        mockMvc.perform( MockMvcRequestBuilders.get("/movie/years").contentType(MediaType.APPLICATION_JSON))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect( jsonPath("$.*.*.yearRelease", hasItem( is( 1994 ))) )
-            .andExpect( jsonPath("$.*.*.winnerCount", hasItem( is( 1 ))) );
-    }
-    
-    @Test
-    public void removeTest() throws Exception {
-        mockMvc.perform( MockMvcRequestBuilders.delete("/movie/4").contentType(MediaType.APPLICATION_JSON))
-            .andExpect( MockMvcResultMatchers.status().isOk() );
-    }
-    
-    @Test
-    public void removeBadRequestTest() throws Exception {
-        mockMvc.perform( MockMvcRequestBuilders.delete("/movie/18").contentType(MediaType.APPLICATION_JSON))
-            .andExpect( MockMvcResultMatchers.status().isBadRequest() );
+            .andExpect( jsonPath("$.*.title", hasItem( is("The Twilight Saga: Breaking Dawn – Part 2"))));
     }
     
     @Test

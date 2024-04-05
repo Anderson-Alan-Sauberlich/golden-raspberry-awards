@@ -5,6 +5,8 @@ import org.desafioapi.dto.ProducerPrizesDTO;
 import org.desafioapi.entity.Movie;
 import org.desafioapi.entity.MovieProducer;
 import org.desafioapi.entity.Producer;
+import org.desafioapi.enumerator.Classification;
+import org.desafioapi.enumerator.Score;
 import org.desafioapi.repository.MovieProducerRepository;
 import org.desafioapi.repository.ProducerRepository;
 import org.slf4j.Logger;
@@ -17,7 +19,7 @@ import java.util.List;
 @Service
 public class ProducerService {
 	
-	Logger logger = LoggerFactory.getLogger(ProducerService.class);
+	private Logger logger = LoggerFactory.getLogger(ProducerService.class);
 	
 	@Autowired
 	private ProducerRepository producerRepository;
@@ -44,18 +46,19 @@ public class ProducerService {
 	public ProducerMinMaxPrizesDTO getMaxAndMinPrizes() {
 		List<MovieProducer> mpList = movieProducerRepository.findByMovieWinnerOrderByProducerId(true);
 		
-		ProducerPrizesDTO min = findMinInterval(mpList);
-		ProducerPrizesDTO max = findMaxInterval(mpList);
-		
 		ProducerMinMaxPrizesDTO dto = new ProducerMinMaxPrizesDTO();
-		dto.addMin(min);
-		dto.addMax(max);
+		dto.addMin(findInterval(mpList, Score.MIN, Classification.FIRST));
+		dto.addMin(findInterval(mpList, Score.MIN, Classification.SECOND));
+		dto.addMax(findInterval(mpList, Score.MAX, Classification.FIRST));
+		dto.addMax(findInterval(mpList, Score.MAX, Classification.SECOND));
 		
 		return dto;
 	}
 
-	private ProducerPrizesDTO findMinInterval(List<MovieProducer> mpList) {
-		ProducerPrizesDTO min = new ProducerPrizesDTO(null, Integer.MAX_VALUE, null, null);
+	private ProducerPrizesDTO findInterval(List<MovieProducer> mpList, Score score, Classification classification) {
+		int interV = score.equals(Score.MIN) ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+		ProducerPrizesDTO prize1 = new ProducerPrizesDTO(null, interV, null, null);
+		ProducerPrizesDTO prize2 = new ProducerPrizesDTO(null, interV, null, null);
 		
 		for ( int i = 0; i < mpList.size() - 1; i++ ) {
 			
@@ -65,49 +68,31 @@ public class ProducerService {
 				MovieProducer mpj = mpList.get(j);
 				
 				if (mpi.getProducer().equals(mpj.getProducer())) {
-					Integer interval = Math.abs(mpi.getMovie().getYearRelease()-mpj.getMovie().getYearRelease());
+					Integer interval = Math.abs(mpi.getMovie().getYearRelease() - mpj.getMovie().getYearRelease());
 					
-					if (interval < min.getInterval()) {
-						min.setInterval(interval);
-						min.setProducer(mpi.getProducer().getName());
-						min.setPreviousWin(mpi.getMovie().getYearRelease());
-						min.setFollowingWin(mpj.getMovie().getYearRelease());
+					if (switch (score) {
+						case MIN -> interval <= prize1.getInterval();
+						case MAX -> interval >= prize1.getInterval();
+					}) {
+
+						prize2 = new ProducerPrizesDTO(prize1.getProducer(), prize1.getInterval(), prize1.getPreviousWin(), prize1.getFollowingWin());
+
+						prize1.setInterval(interval);
+						prize1.setProducer(mpi.getProducer().getName());
+						prize1.setPreviousWin(mpi.getMovie().getYearRelease());
+						prize1.setFollowingWin(mpj.getMovie().getYearRelease());
 						
 						break;
 					}
 				}
 			}
 		}
-		
-		return min;
+
+        return switch (classification) {
+            case FIRST -> prize1;
+            case SECOND -> prize2;
+        };
+
 	}
-	
-	private ProducerPrizesDTO findMaxInterval(List<MovieProducer> mpList) {
-		ProducerPrizesDTO max = new ProducerPrizesDTO(null, Integer.MIN_VALUE, null, null);
-		
-		for ( int i = 0; i < mpList.size() - 1; i++ ) {
-			
-			for (int j = i + 1; j < mpList.size(); j++) {
-				
-				MovieProducer mpi = mpList.get(i);
-				MovieProducer mpj = mpList.get(j);
-				
-				if (mpi.getProducer().equals(mpj.getProducer())) {
-					Integer interval = Math.abs(mpi.getMovie().getYearRelease()-mpj.getMovie().getYearRelease());
-					
-					if (interval > max.getInterval()) {
-						max.setInterval(interval);
-						max.setProducer(mpi.getProducer().getName());
-						max.setPreviousWin(mpi.getMovie().getYearRelease());
-						max.setFollowingWin(mpj.getMovie().getYearRelease());
-						
-						break;
-					}
-				}
-			}
-		}
-		
-		return max;
-	}
-	
+
 }

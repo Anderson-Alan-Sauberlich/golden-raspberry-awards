@@ -41,14 +41,6 @@ public class MovieService {
 		
 		return moviesDto;		
 	}
-	
-	public YearWinnerDTO getYearReleasesWithMoreThanOneWinners() {
-		List<YearReleaseWinnerMovieDTO> years = movieRepository.findYearReleasesWithMoreThanOneWinner();
-		if (years == null || years.isEmpty()) {
-			return new YearWinnerDTO();
-		}
-		return new YearWinnerDTO(years);
-	}
 
 	public void remove(Long id) {
 		Optional<Movie> optional = movieRepository.findById(id);

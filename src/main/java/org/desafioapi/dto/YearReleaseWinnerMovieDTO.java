@@ -4,9 +4,9 @@ public class YearReleaseWinnerMovieDTO {
 	
 	private Integer yearRelease;
 	
-	private Integer winnerCount;
+	private Long winnerCount;
 	
-	public YearReleaseWinnerMovieDTO(Integer yearRelease, Integer winnerCount) {
+	public YearReleaseWinnerMovieDTO(Integer yearRelease, Long winnerCount) {
 		this.yearRelease = yearRelease;
 		this.winnerCount = winnerCount;
 	}
@@ -19,11 +19,11 @@ public class YearReleaseWinnerMovieDTO {
 		this.yearRelease = yearRelease;
 	}
 
-	public Integer getWinnerCount() {
+	public Long getWinnerCount() {
 		return winnerCount;
 	}
 
-	public void setWinnerCount(Integer winnerCount) {
+	public void setWinnerCount(Long winnerCount) {
 		this.winnerCount = winnerCount;
 	}
 	

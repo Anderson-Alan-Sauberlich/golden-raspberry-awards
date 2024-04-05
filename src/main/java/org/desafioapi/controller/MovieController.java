@@ -32,21 +32,6 @@ public class MovieController {
         return new ResponseEntity<List<MovieDTO>>( movies, status ) ;
     }
 	
-	/**
-	 * @return {@link YearWinnerDTO}
-	 */
-	@GetMapping("/years")
-	public ResponseEntity<YearWinnerDTO> getYearsWithMoreThanOneWinners() {
-		YearWinnerDTO dto = movieService.getYearReleasesWithMoreThanOneWinners();
-		
-		HttpStatus status = HttpStatus.OK;
-		if ( dto.getYears().isEmpty() ) {
-			status = HttpStatus.NO_CONTENT;
-		}
-		
-		return new ResponseEntity<YearWinnerDTO>( dto, status ) ;
-	}
-	
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> removeMovie(@PathVariable(name="id") Long id) {
 		movieService.remove(id);
